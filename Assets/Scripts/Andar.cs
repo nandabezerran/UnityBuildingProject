@@ -17,38 +17,55 @@ namespace Assets.Scripts
             _casa = casa;
         }
 
-        public void CarregaSuperficie(string[] triangulo1, string[] triangulo2)
+        public void CarregaSuperficie(string[] dadosSuperficie)
         {
             List<int> pontos = new List<int>();
-            pontos.Add(int.Parse(triangulo1[2]));
-            pontos.Add(int.Parse(triangulo1[3]));
-            pontos.Add(int.Parse(triangulo1[4]));
-            pontos.Add(int.Parse(triangulo2[4]));
+            pontos.Add(int.Parse(dadosSuperficie[2]));
+            pontos.Add(int.Parse(dadosSuperficie[3]));
+            pontos.Add(int.Parse(dadosSuperficie[4]));
+            pontos.Add(int.Parse(dadosSuperficie[5]));
 
-            TiposSuperficie tipo = TiposSuperficie.PAREDE;
+            TypesSurface tipo = TypesSurface.OUTWALL;
             int tipoInt;
 
-            if(int.TryParse(triangulo1[5], out tipoInt))
+            if(int.TryParse(dadosSuperficie[6], out tipoInt))
             {
-                tipo = (TiposSuperficie)tipoInt;
+                tipo = (TypesSurface)tipoInt;
             }
             else
             {
-                switch(triangulo1[5].ToLower())
+                switch(dadosSuperficie[5].ToLower())
                 {
-                    case "wall":
-                        tipo = TiposSuperficie.PAREDE;
+                    case "outwall":
+                        tipo = TypesSurface.OUTWALL;
+                        break;
+                    case "inwall":
+                        tipo = TypesSurface.INWALL;
                         break;
                     case "base":
-                        tipo = TiposSuperficie.PISO;
+                        tipo = TypesSurface.BASE;
                         break;
                     case "roof":
-                        tipo = TiposSuperficie.TETO;
+                        tipo = TypesSurface.ROOF;
+                        break;
+                    case "toproof":
+                        tipo = TypesSurface.TOPROOF;
                         break;
                 }
             }
 
-            _superficies.Add(new Superficie(pontos, tipo, _casa));
+            Superficie newSuperficie = new Superficie(pontos, tipo, _casa);
+
+            _superficies.Add(newSuperficie);
+            
+            if(dadosSuperficie.Length > 7)
+            {
+                newSuperficie.AdicionarJanela(
+                    float.Parse(dadosSuperficie[8]),
+                    float.Parse(dadosSuperficie[9]),
+                    float.Parse(dadosSuperficie[10])
+                );
+            }
         }
 
         public void AdicionarAndar(ref List<List<int>> triangulos, ref List<List<Vector2>> uvs)

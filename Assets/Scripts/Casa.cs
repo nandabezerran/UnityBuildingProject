@@ -15,6 +15,8 @@ public class Casa : MonoBehaviour
 
     public MeshFilter meshFilter;
     public Animation simulationAnimation;
+    public Camera mainCamera;
+    public GameObject pessoa;
 
     public List<GameObject> pontosCasa;
 
@@ -28,14 +30,19 @@ public class Casa : MonoBehaviour
 
     private string _path = "Assets/Resources/frames-1.txt";
 
+    private float horizontalSpeed = 7.0f;
+    private float verticalSpeed = 7.0f;
+
     private List<List<List<Keyframe>>> _verticesKeyframes = new List<List<List<Keyframe>>>();
     private AnimationClip _simulationClip;
 
-    private Dictionary<TiposSuperficie, int> _superficiesSubMeshes = new Dictionary<TiposSuperficie, int>()
+    private Dictionary<TypesSurface, int> _superficiesSubMeshes = new Dictionary<TypesSurface, int>()
     {
-        {TiposSuperficie.PAREDE, 1 },
-        {TiposSuperficie.TETO, 1 },
-        {TiposSuperficie.PISO, 0 }
+        {TypesSurface.OUTWALL, 1 },
+        {TypesSurface.INWALL, 1 },
+        {TypesSurface.ROOF, 1 },
+        {TypesSurface.TOPROOF, 1 },
+        {TypesSurface.BASE, 0 }
     };
 
     private int _numSubMeshes = 2;
@@ -60,6 +67,11 @@ public class Casa : MonoBehaviour
     void Update()
     {
         UpdateVertices();
+
+        float h  = horizontalSpeed * Input.GetAxis("Mouse X");
+        pessoa.transform.Rotate(0, h, 0);
+        float v  = verticalSpeed * Input.GetAxis("Mouse Y");
+        mainCamera.transform.Rotate(v, 0, 0);
     }
 
     internal int GetNumSubMeshs()
@@ -67,7 +79,7 @@ public class Casa : MonoBehaviour
         return _numSubMeshes;
     }
 
-    internal int GetSubMeshParaSuperficie(TiposSuperficie tipo)
+    internal int GetSubMeshParaSuperficie(TypesSurface tipo)
     {
         return _superficiesSubMeshes[tipo];
     }
@@ -75,6 +87,11 @@ public class Casa : MonoBehaviour
     internal Vector3 GetPonto(int id)
     {
         return pontosCasa[id - 1].transform.position;
+    }
+
+    internal void AddBoxCollider()
+    {
+        gameObject.AddComponent<BoxCollider>();
     }
 
     private void CarregarCasa(StreamReader arquivoDaCasa)
@@ -168,31 +185,14 @@ public class Casa : MonoBehaviour
     {
         string linhaAtual;
         string idAndar = "";
-        string[] primeiroTriangulo = { };
         while (!string.IsNullOrEmpty(linhaAtual = arquivoDaCasa.ReadLine()))
         {
-            string[] trianguloAtual = linhaAtual.Split(' ');
-            if(trianguloAtual.Length != 6)
-            {
-                throw new Exception("Arquivo da casa mal formatado na linha: " + linhaAtual);
-            }
-            idAndar = trianguloAtual[0];
-            int idTriangulo = int.Parse(trianguloAtual[1]);
-            if (idTriangulo == bloqueioDeCarregamento)
-            {
-                // TEMP: break temporario
-                break;
-            }
-            if(idTriangulo % 2 == 0)
-            {
-                primeiroTriangulo = trianguloAtual;
-            }
-            else
-            {
-                Andar andar = new Andar(int.Parse(idAndar), this);
-                andar.CarregaSuperficie(primeiroTriangulo, trianguloAtual);
-                _andares.Add(andar);
-            }
+            string[] currentSurface = linhaAtual.Split(' ');
+            idAndar = currentSurface[0];
+            int surfaceId = int.Parse(currentSurface[1]);
+            Andar andar = new Andar(int.Parse(idAndar), this);
+            andar.CarregaSuperficie(currentSurface);
+            _andares.Add(andar);
         }
     }
 
@@ -204,9 +204,25 @@ public class Casa : MonoBehaviour
         {
             if(linhaAtual.Contains("#frame.nodes.aux"))
             {
-                arquivoDaCasa.ReadLine();
-                arquivoDaCasa.ReadLine();
+                if(firstFrame)
+                {
+                    var cameraPosData = arquivoDaCasa.ReadLine().Split(' ');
+                    var cameraLookAtData = arquivoDaCasa.ReadLine().Split(' ');
+
+                    pessoa.transform.position = new Vector3(
+                        float.Parse(cameraPosData[1]),
+                        float.Parse(cameraPosData[2]),
+                        float.Parse(cameraPosData[3])
+                    );
+                    mainCamera.transform.Rotate(new Vector3(0f, 1f, 0f), 45f);
+                }
+                else
+                {
+                    arquivoDaCasa.ReadLine();
+                    arquivoDaCasa.ReadLine();
+                }
                 break;
+
             }
             string[] vertexData = linhaAtual.Split(' ');
             if (vertexData.Length != 4)
