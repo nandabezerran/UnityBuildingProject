@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.Globalization;
 
 namespace Assets.Scripts
 {
@@ -61,9 +62,9 @@ namespace Assets.Scripts
             if(dadosSuperficie.Length > 7)
             {
                 newSuperficie.AdicionarJanela(
-                    float.Parse(dadosSuperficie[8]),
-                    float.Parse(dadosSuperficie[9]),
-                    float.Parse(dadosSuperficie[10])
+                    float.Parse(dadosSuperficie[8], NumberStyles.Any, CultureInfo.InvariantCulture),
+                    float.Parse(dadosSuperficie[9], NumberStyles.Any, CultureInfo.InvariantCulture),
+                    float.Parse(dadosSuperficie[10],NumberStyles.Any, CultureInfo.InvariantCulture)
                 );
             }
         }

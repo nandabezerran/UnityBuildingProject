@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 
@@ -71,7 +72,7 @@ public class Casa : MonoBehaviour
         float h  = horizontalSpeed * Input.GetAxis("Mouse X");
         pessoa.transform.Rotate(0, h, 0);
         float v  = verticalSpeed * Input.GetAxis("Mouse Y");
-        mainCamera.transform.Rotate(v, 0, 0);
+        mainCamera.transform.Rotate(-v, 0, 0);
     }
 
     internal int GetNumSubMeshs()
@@ -210,9 +211,9 @@ public class Casa : MonoBehaviour
                     var cameraLookAtData = arquivoDaCasa.ReadLine().Split(' ');
 
                     pessoa.transform.position = new Vector3(
-                        float.Parse(cameraPosData[1]),
-                        float.Parse(cameraPosData[2]),
-                        float.Parse(cameraPosData[3])
+                        float.Parse(cameraPosData[1], NumberStyles.Any, CultureInfo.InvariantCulture),
+                        float.Parse(cameraPosData[2], NumberStyles.Any, CultureInfo.InvariantCulture),
+                        float.Parse(cameraPosData[3], NumberStyles.Any, CultureInfo.InvariantCulture)
                     );
                     mainCamera.transform.Rotate(new Vector3(0f, 1f, 0f), 45f);
                 }
@@ -229,9 +230,9 @@ public class Casa : MonoBehaviour
             {
                 throw new Exception("Arquivo da casa mal formatado na linha: " + linhaAtual);
             }
-            float x = float.Parse(vertexData[1]);
-            float y = float.Parse(vertexData[2]);
-            float z = float.Parse(vertexData[3]);
+            float x = float.Parse(vertexData[1], NumberStyles.Any, CultureInfo.InvariantCulture);
+            float y = float.Parse(vertexData[2], NumberStyles.Any, CultureInfo.InvariantCulture);
+            float z = float.Parse(vertexData[3], NumberStyles.Any, CultureInfo.InvariantCulture);
 
             if (firstFrame)
             {
