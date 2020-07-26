@@ -68,11 +68,13 @@ public class Casa : MonoBehaviour
     void Update()
     {
         UpdateVertices();
-
-        float h  = horizontalSpeed * Input.GetAxis("Mouse X");
-        pessoa.transform.Rotate(0, h, 0);
-        float v  = verticalSpeed * Input.GetAxis("Mouse Y");
-        mainCamera.transform.Rotate(-v, 0, 0);
+        if (Input.GetMouseButton(0))
+        {
+            float h = horizontalSpeed * Input.GetAxis("Mouse X");
+            pessoa.transform.Rotate(0, h, 0);
+            float v = verticalSpeed * Input.GetAxis("Mouse Y");
+            mainCamera.transform.Rotate(-v, 0, 0);
+        }
     }
 
     internal int GetNumSubMeshs()
@@ -215,7 +217,7 @@ public class Casa : MonoBehaviour
                         float.Parse(cameraPosData[2], NumberStyles.Any, CultureInfo.InvariantCulture),
                         float.Parse(cameraPosData[3], NumberStyles.Any, CultureInfo.InvariantCulture)
                     );
-                    mainCamera.transform.Rotate(new Vector3(0f, 1f, 0f), 45f);
+                    mainCamera.transform.Rotate(new Vector3(0f, 1f, 0f), 270f);
                 }
                 else
                 {
