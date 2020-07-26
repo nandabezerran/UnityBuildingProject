@@ -18,12 +18,14 @@ public class Casa : MonoBehaviour
     public Animation simulationAnimation;
     public Camera mainCamera;
     public GameObject pessoa;
+    public GameObject lightSource;
 
     public List<GameObject> pontosCasa;
+    public List<Vector3> initialPoints = new List<Vector3>();
 
     public float fps = 30f;
 
-    public int bloqueioDeCarregamento = 14;
+    public float amp = 2f;
 
     private Mesh _meshGerada;
 
@@ -217,6 +219,7 @@ public class Casa : MonoBehaviour
                         float.Parse(cameraPosData[2], NumberStyles.Any, CultureInfo.InvariantCulture),
                         float.Parse(cameraPosData[3], NumberStyles.Any, CultureInfo.InvariantCulture)
                     );
+                    lightSource.transform.position = pessoa.transform.position + new Vector3(0f, 2.0f, 0f);
                     mainCamera.transform.Rotate(new Vector3(0f, 1f, 0f), 270f);
                 }
                 else
@@ -241,6 +244,7 @@ public class Casa : MonoBehaviour
                 var vertexKeyFrames = new List<List<Keyframe>>();
 
                 Vector3 p = new Vector3(x, y, z);
+                initialPoints.Add(p);
                 GameObject goPoint = new GameObject("P" + vertexData[0]);
                 goPoint.transform.parent = transform;
                 goPoint.transform.position = p;
@@ -265,13 +269,16 @@ public class Casa : MonoBehaviour
                 int vertexId = int.Parse(vertexData[0]) - 1;
                 
                 var xKeyframes = _verticesKeyframes[vertexId][0];
-                xKeyframes.Add(new Keyframe((60f / fps) / 60f * count, x));
+                float modX = initialPoints[vertexId].x + (x - initialPoints[vertexId].x) * amp;
+                xKeyframes.Add(new Keyframe((60f / fps) / 60f * count, modX));
 
                 var yKeyframes = _verticesKeyframes[vertexId][1];
-                yKeyframes.Add(new Keyframe((60f / fps) / 60f * count, y));
+                float modY = initialPoints[vertexId].y + (y - initialPoints[vertexId].y) * amp;
+                yKeyframes.Add(new Keyframe((60f / fps) / 60f * count, modY));
 
                 var zKeyframes = _verticesKeyframes[vertexId][2];
-                zKeyframes.Add(new Keyframe((60f / fps) / 60f * count, z));
+                float modZ = initialPoints[vertexId].z + (z - initialPoints[vertexId].z) * amp;
+                zKeyframes.Add(new Keyframe((60f / fps) / 60f * count, modZ));
             }
         }
 

@@ -80,6 +80,10 @@ namespace Assets.Scripts
                     uvs[i].Add(new Vector2(1f, 1f - _janela.distanciaHorizontal));
                     uvs[i].Add(new Vector2(1f, _janela.distanciaHorizontal));
                     uvs[i].Add(new Vector2(1f, 0f));
+                    uvs[i].Add(new Vector2(0f, 1f - _janela.distanciaHorizontal));
+                    uvs[i].Add(new Vector2(0f, _janela.distanciaHorizontal));
+                    uvs[i].Add(new Vector2(1f, _janela.distanciaHorizontal));
+                    uvs[i].Add(new Vector2(1f, 1f - _janela.distanciaHorizontal));
                 }
                 else
                 {
@@ -98,6 +102,14 @@ namespace Assets.Scripts
                     vertId + 2, vertId + 8, vertId + 9,
                     vertId + 6, vertId + 7, vertId + 9,
                     vertId + 6, vertId + 9, vertId + 10,
+                    vertId + 5, vertId + 4, vertId + 12,
+                    vertId + 5, vertId + 12,vertId + 13,
+                    vertId + 5, vertId + 13,vertId + 14,
+                    vertId + 5, vertId + 14,vertId + 6,
+                    vertId + 14,vertId + 15,vertId + 7,
+                    vertId + 14,vertId + 7, vertId + 6,
+                    vertId + 12,vertId + 4, vertId + 7,
+                    vertId + 12,vertId + 7, vertId + 15,
                 });
             }
             else
@@ -114,7 +126,7 @@ namespace Assets.Scripts
             vertId = vertices.Count;
             if (_janela != null)
             {
-                Vector3[] windowPoints = new Vector3[12];
+                Vector3[] windowPoints = new Vector3[16];
 
                 windowPoints[0] = _casa.GetPonto(_refPontos[0]);
                 windowPoints[3] = _casa.GetPonto(_refPontos[1]);
@@ -122,6 +134,7 @@ namespace Assets.Scripts
                 windowPoints[11] = _casa.GetPonto(_refPontos[3]);
 
                 Vector3 vectorAB = windowPoints[3] - windowPoints[0];
+                Vector3 vectorAD = windowPoints[11] - windowPoints[0];
                 Vector3 vectorDC = windowPoints[8] - windowPoints[11];
 
                 windowPoints[1] = (vectorAB * _janela.distanciaHorizontal) + windowPoints[0];
@@ -129,13 +142,20 @@ namespace Assets.Scripts
                 windowPoints[9] = (vectorDC * (1f - _janela.distanciaHorizontal)) + windowPoints[11];
                 windowPoints[10] = (vectorDC * _janela.distanciaHorizontal) + windowPoints[11];
 
-                Vector3 vectorW1W8 = windowPoints[10] - windowPoints[1];
-                Vector3 vectorW2W7 = windowPoints[9] - windowPoints[2];
+                Vector3 vectorW1W10 = windowPoints[10] - windowPoints[1];
+                Vector3 vectorW2W9 = windowPoints[9] - windowPoints[2];
 
-                windowPoints[4] = (vectorW2W7 * _janela.distanciaEsquerda) + windowPoints[2];
-                windowPoints[5] = (vectorW1W8 * _janela.distanciaEsquerda) + windowPoints[1];
-                windowPoints[6] = (vectorW1W8 * _janela.distanciaDireita) + windowPoints[1];
-                windowPoints[7] = (vectorW2W7 * _janela.distanciaDireita) + windowPoints[2];
+                windowPoints[4] = (vectorW2W9 * _janela.distanciaEsquerda) + windowPoints[2];
+                windowPoints[5] = (vectorW1W10 * _janela.distanciaEsquerda) + windowPoints[1];
+                windowPoints[6] = (vectorW1W10 * _janela.distanciaDireita) + windowPoints[1];
+                windowPoints[7] = (vectorW2W9 * _janela.distanciaDireita) + windowPoints[2];
+
+                Vector3 revNormal =  Vector3.Cross(vectorAD, vectorAB).normalized * 0.25f;
+
+                windowPoints[12] = windowPoints[4] + revNormal;
+                windowPoints[13] = windowPoints[5] + revNormal;
+                windowPoints[14] = windowPoints[6] + revNormal;
+                windowPoints[15] = windowPoints[7] + revNormal;
 
                 vertices.AddRange(windowPoints);
             }
